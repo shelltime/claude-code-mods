@@ -1,0 +1,13 @@
+{
+  "name": "shelltime-statusline",
+  "version": "0.1.0",
+  "description": "ShellTime statusline for Claude Code: git, model, session and daily cost, quota, agent time and context, in the terminal and the desktop app.",
+  "author": {
+    "name": "ShellTime",
+    "url": "https://shelltime.xyz"
+  },
+  "homepage": "https://github.com/shelltime/claude-code-mods",
+  "repository": "https://github.com/shelltime/claude-code-mods",
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

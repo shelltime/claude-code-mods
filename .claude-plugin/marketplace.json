@@ -1,0 +1,18 @@
+{
+  "name": "shelltime",
+  "owner": {
+    "name": "ShellTime",
+    "url": "https://shelltime.xyz"
+  },
+  "metadata": {
+    "description": "Claude Code mods by ShellTime"
+  },
+  "plugins": [
+    {
+      "name": "shelltime-statusline",
+      "source": "./plugins/shelltime-statusline",
+      "description": "ShellTime statusline for Claude Code: git, model, session and daily cost, quota, agent time and context, in the terminal and the desktop app.",
+      "category": "productivity"
+    }
+  ]
+}
