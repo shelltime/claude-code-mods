@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.1.2](https://github.com/shelltime/claude-code-mods/compare/v0.1.1...v0.1.2) (2026-10-04)
+
+
+### Features
+
+* **statusline:** flatten the desktop band and use Claude theme colors ([eeca466](https://github.com/shelltime/claude-code-mods/commit/eeca4666a616b7562ce7e774b2d60e2e9e69040e))
+* **statusline:** flatten the desktop band, Claude theme colors, Storybook + Vitest ([4b5d148](https://github.com/shelltime/claude-code-mods/commit/4b5d14893b03f832f8ed7068e3a68afb68572311))
+
+
+### Documentation
+
+* **readme:** show what the statusline looks like ([f1a23d5](https://github.com/shelltime/claude-code-mods/commit/f1a23d5a8c03df5058b53a8d7841d8d606e1ffad))
+* **readme:** show what the statusline looks like ([4f23a28](https://github.com/shelltime/claude-code-mods/commit/4f23a28d61b2b1c6c05d872cf67455b04d03c34b))
+
+
+### Build System
+
+* **storybook:** add Storybook and Vitest UI preview for mods ([a872bb9](https://github.com/shelltime/claude-code-mods/commit/a872bb9d455c9bcb5cb490a5db88e6c4b0957a99))
+
 ## [0.1.1](https://github.com/shelltime/claude-code-mods/compare/v0.1.0...v0.1.1) (2026-10-04)
 
 
