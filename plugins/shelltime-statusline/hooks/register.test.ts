@@ -1,4 +1,5 @@
 import { expect, mock, test } from 'claude-code/testing'
+import type { Engine } from 'claude-code/testing'
 import type { On } from 'claude-code'
 
 const PLUGIN = 'shelltime-statusline'
@@ -69,6 +70,15 @@ function world(on: On, token?: string) {
   return { clock, gitCalls, requests }
 }
 
+function mountBand($: Engine, surface: (typeof SURFACES)[number], props = PROPS) {
+  return $.ui.mount({ plugin: PLUGIN, surface, component: 'AbovePrompt', props })
+}
+
+const SESSION_URL = 'https://shelltime.xyz/users/annatarhe/coding-agent/session/sess-1'
+const DAILY_URL = 'https://shelltime.xyz/users/annatarhe/coding-agent/claude-code'
+const USAGE_URL = 'https://claude.ai/settings/usage'
+const PROFILE_URL = 'https://shelltime.xyz/users/annatarhe'
+
 test('draws the full statusline, with links, on terminal and desktop', async ($, on) => {
   const { clock, gitCalls, requests } = world(on, 'tok-123')
 
@@ -87,20 +97,40 @@ test('draws the full statusline, with links, on terminal and desktop', async ($,
     JSON.stringify({ sessionId: 'sess-1', projectPath: '/work/app' }),
   )
 
-  for (const surface of SURFACES) {
-    const ui = await $.ui.mount({ plugin: PLUGIN, surface, component: 'AbovePrompt', props: PROPS })
-    for (const text of ['🌿 main*', '🤖 Opus 5.5', '💰 $1.23', '📊 $12.50', '🚦 5h:23% 7d:45%', '⏱️ 1h5m', '📈 42%']) {
-      expect(await ui.find({ type: 'Text', text }), `${surface}: ${text}`).toBeDefined()
-    }
-    const links = (await ui.findAll({ type: 'Link' })).map(link => link.props.href)
-    expect(links).toEqual([
-      'https://shelltime.xyz/users/annatarhe/coding-agent/session/sess-1',
-      'https://shelltime.xyz/users/annatarhe/coding-agent/claude-code',
-      'https://claude.ai/settings/usage',
-      'https://shelltime.xyz/users/annatarhe',
-    ])
-    await ui.unmount()
+  const terminal = await mountBand($, 'terminal')
+  for (const text of ['🌿 main*', '🤖 Opus 5.5', '💰 $1.23', '📊 $12.50', '🚦 5h:23% 7d:45%', '⏱️ 1h5m', '📈 42%']) {
+    expect(await terminal.find({ type: 'Text', text }), text).toBeDefined()
   }
+  expect((await terminal.findAll({ type: 'Link' })).map(link => link.props.href)).toEqual([
+    SESSION_URL,
+    DAILY_URL,
+    USAGE_URL,
+    PROFILE_URL,
+  ])
+  await terminal.unmount()
+
+  const desktop = await mountBand($, 'desktop')
+  for (const key of ['git', 'sessionCost', 'dailyCost', 'quota', 'agentTime', 'context']) {
+    expect(await desktop.find({ key: `pill-${key}` }), key).toBeDefined()
+  }
+  expect(await desktop.find({ key: 'pill-model' })).toBeUndefined()
+  expect(await desktop.find({ type: 'Text', text: 'Opus 5.5' })).toBeUndefined()
+  for (const text of ['main*', '$1.23', '$12.50', '1h5m', '23%', '45%', '42%']) {
+    expect(await desktop.find({ type: 'Text', text }), text).toBeDefined()
+  }
+  expect((await desktop.findAll({ type: 'Svg' })).map(svg => svg.props.alt)).toEqual([
+    '5-hour quota used: 23%',
+    '7-day quota used: 45%',
+    'Context window used: 42%',
+  ])
+  expect((await desktop.findAll({ type: 'Link' })).map(link => link.props.href)).toEqual([
+    SESSION_URL,
+    DAILY_URL,
+    USAGE_URL,
+    USAGE_URL,
+    PROFILE_URL,
+  ])
+  await desktop.unmount()
 })
 
 test('without a ShellTime token: local figures only, no API calls', async ($, on) => {
@@ -111,16 +141,20 @@ test('without a ShellTime token: local figures only, no API calls', async ($, on
   await clock.settle()
 
   expect(requests).toHaveLength(0)
-  for (const surface of SURFACES) {
-    const ui = await $.ui.mount({ plugin: PLUGIN, surface, component: 'AbovePrompt', props: PROPS })
-    expect(await ui.find({ type: 'Text', text: '💰 $1.23' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: '📊 -' })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: '⏱️ -' })).toBeDefined()
-    expect((await ui.findAll({ type: 'Link' })).map(link => link.props.href)).toEqual([
-      'https://claude.ai/settings/usage',
-    ])
-    await ui.unmount()
+
+  const terminal = await mountBand($, 'terminal')
+  for (const text of ['💰 $1.23', '📊 -', '⏱️ -']) {
+    expect(await terminal.find({ type: 'Text', text }), text).toBeDefined()
   }
+  expect((await terminal.findAll({ type: 'Link' })).map(link => link.props.href)).toEqual([USAGE_URL])
+  await terminal.unmount()
+
+  const desktop = await mountBand($, 'desktop')
+  expect(await desktop.find({ type: 'Text', text: '$1.23' })).toBeDefined()
+  expect((await desktop.find({ key: 'pill-dailyCost' }))?.text).toBe('📊-')
+  expect((await desktop.find({ key: 'pill-agentTime' }))?.text).toBe('⏱️-')
+  expect((await desktop.findAll({ type: 'Link' })).map(link => link.props.href)).toEqual([USAGE_URL, USAGE_URL])
+  await desktop.unmount()
 })
 
 test('the API is asked at most once per 15 seconds', async ($, on) => {
@@ -151,14 +185,9 @@ test('yields the band to a survey', async ($, on) => {
   await clock.settle()
 
   for (const surface of SURFACES) {
-    const ui = await $.ui.mount({
-      plugin: PLUGIN,
-      surface,
-      component: 'AbovePrompt',
-      props: { ...PROPS, hasSurvey: true },
-    })
-    expect(await ui.find({ type: 'Text', text: '🌿 main*' })).toBeUndefined()
-    expect(await ui.find({ type: 'Text', text: 'survey' })).toBeDefined()
+    const ui = await mountBand($, surface, { ...PROPS, hasSurvey: true })
+    expect(await ui.find({ key: 'shelltime-statusline' }), surface).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: 'survey' }), surface).toBeDefined()
     await ui.unmount()
   }
 })

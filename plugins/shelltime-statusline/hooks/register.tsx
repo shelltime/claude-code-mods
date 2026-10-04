@@ -13,7 +13,9 @@ import {
 import type { ApiRequest, ApiResponse } from './api'
 import { BASE_FILES, LOCAL_FILES, formatOf, mergeConfig, parseShellTimeConfig, resolveConfig } from './config'
 import type { ShellTimeConfig } from './config'
-import { SEPARATOR, buildSegments, displayModelName } from './segments'
+import { buildSegments, displayModelName } from './segments'
+import { StatusPills } from './ui/desktop'
+import { StatusLine } from './ui/terminal'
 
 const view = atom({ plugin: 'shelltime-statusline', key: 'view' } as const, null)
 
@@ -240,25 +242,12 @@ export const register: Register = on => {
       return next(e)
     }
 
-    const { Box, Text, Link } = $.ui.resolve(e)
-
-    const children = buildSegments(current).flatMap((segment, i) => {
-      const label =
-        segment.color === undefined ? (
-          <Text>{segment.text}</Text>
-        ) : segment.color === 'gray' ? (
-          <Text dimColor>{segment.text}</Text>
-        ) : (
-          <Text color={segment.color}>{segment.text}</Text>
-        )
-      const drawn = segment.url === undefined ? label : <Link href={segment.url}>{label}</Link>
-      return i === 0 ? [drawn] : [<Text dimColor>{SEPARATOR}</Text>, drawn]
-    })
-
-    return (
-      <Box key="shelltime-statusline" flexDirection="row" flexWrap="wrap">
-        {children}
-      </Box>
+    // The terminal keeps the CLI's line; graphical surfaces draw pills.
+    const segments = buildSegments(current)
+    return e.surface === 'terminal' ? (
+      <StatusLine ui={$.ui.resolve(e)} segments={segments} />
+    ) : (
+      <StatusPills ui={$.ui.resolve(e)} segments={segments} />
     )
   })
 }

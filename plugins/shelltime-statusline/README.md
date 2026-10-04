@@ -1,20 +1,30 @@
 # shelltime-statusline
 
-The [ShellTime](https://shelltime.xyz) statusline as a Claude Code mod. It draws the same line as `shelltime cc statusline` in a band above the prompt. It runs in the terminal and in the Code tab of the Claude desktop app, where the `statusLine` command from `settings.json` is not drawn.
+The [ShellTime](https://shelltime.xyz) statusline as a Claude Code mod. It draws the ShellTime statusline in a band above the prompt. It runs in the terminal and in the Code tab of the Claude desktop app, where the `statusLine` command from `settings.json` is not drawn.
+
+In the terminal it is the same line as `shelltime cc statusline`:
 
 ```
 🌿 main* | 🤖 Opus 5.5 | 💰 $1.23 | 📊 $12.50 | 🚦 5h:23% 7d:45% | ⏱️ 1h5m | 📈 42%
 ```
 
+In the desktop app each segment is a rounded pill, in tones that read on the light and the dark theme. Quota and context get a small bar beside each percentage. The model is left out there, since the composer's footer already shows it.
+
+```
+╭─────────╮ ╭─────────╮ ╭───────────╮ ╭───────────────────────────╮ ╭─────────╮ ╭──────────────╮
+│ 🌿 main*│ │ 💰 $1.23│ │ 📊 $12.50 │ │ 🚦 5h ━━── 23%  7d ━━━─ 45%│ │ ⏱️ 1h5m │ │ 📈 ━━── 42%  │
+╰─────────╯ ╰─────────╯ ╰───────────╯ ╰───────────────────────────╯ ╰─────────╯ ╰──────────────╯
+```
+
 | Segment | Shows | Color | Link |
 | --- | --- | --- | --- |
 | 🌿 | Git branch, with `*` when the tree is dirty | green, gray `-` outside a repo | |
-| 🤖 | Model | | |
+| 🤖 | Model (terminal only) | | |
 | 💰 | This session's cost | cyan | the session on shelltime.xyz |
-| 📊 | Today's Claude Code cost | yellow, gray `-` with none | your coding agent page |
-| 🚦 | 5-hour and 7-day quota used | green, yellow from 50%, red from 80% | claude.ai usage |
+| 📊 | Today's Claude Code cost | yellow (amber on desktop), gray `-` with none | your coding agent page |
+| 🚦 | 5-hour and 7-day quota used | green, yellow from 50%, red from 80%; on desktop each bucket has its own bar and color | claude.ai usage |
 | ⏱️ | Today's AI agent time | magenta, gray `-` with none | your profile |
-| 📈 | Context window used | green, yellow from 50%, red from 80% | |
+| 📈 | Context window used, with a bar on desktop | green, yellow from 50%, red from 80% | |
 
 ## Install
 
