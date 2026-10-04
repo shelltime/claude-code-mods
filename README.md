@@ -34,6 +34,12 @@ claude --plugin-dir plugins/shelltime-statusline
 
 The engine writes the API types beside a loaded mod in `.claude-plugin/types/`, along with a `tsconfig.json`, so `tsc -p plugins/shelltime-statusline` type-checks it.
 
+## Release
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org). On `main`, [release-please](https://github.com/googleapis/release-please) keeps a release PR open. Merging it tags `vX.Y.Z`, updates `CHANGELOG.md` and bumps the version in each mod's `plugin.json`, which is what tells installed copies to update.
+
+When you add a mod, add its `.claude-plugin/plugin.json` to `extra-files` in `release-please-config.json`.
+
 ## License
 
 MIT
