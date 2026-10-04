@@ -14,7 +14,7 @@ import type { ApiRequest, ApiResponse } from './api'
 import { BASE_FILES, LOCAL_FILES, formatOf, mergeConfig, parseShellTimeConfig, resolveConfig } from './config'
 import type { ShellTimeConfig } from './config'
 import { buildSegments, displayModelName } from './segments'
-import { StatusPills } from './ui/desktop'
+import { StatusRow } from './ui/desktop'
 import { StatusLine } from './ui/terminal'
 
 const view = atom({ plugin: 'shelltime-statusline', key: 'view' } as const, null)
@@ -242,12 +242,12 @@ export const register: Register = on => {
       return next(e)
     }
 
-    // The terminal keeps the CLI's line; graphical surfaces draw pills.
+    // The terminal keeps the CLI's line; graphical surfaces draw a flat row.
     const segments = buildSegments(current)
     return e.surface === 'terminal' ? (
       <StatusLine ui={$.ui.resolve(e)} segments={segments} />
     ) : (
-      <StatusPills ui={$.ui.resolve(e)} segments={segments} />
+      <StatusRow ui={$.ui.resolve(e)} segments={segments} />
     )
   })
 }

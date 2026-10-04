@@ -13,7 +13,6 @@ import {
   quotaSegment,
   segmentText,
 } from './segments'
-import { DESKTOP_TONES, meterSvg } from './ui/desktop'
 
 const VIEW: StatuslineView = {
   git: { branch: 'main', dirty: false },
@@ -133,23 +132,6 @@ describe('quotaSegment', () => {
       { label: '5h', percent: 23.4, description: '5-hour quota used' },
       { label: '7d', percent: 45.6, description: '7-day quota used' },
     ])
-  })
-})
-
-describe('meterSvg', () => {
-  const fillWidth = (svg: string) => /<rect width="(\d+)" height="6" rx="3" fill="#[0-9a-f]{6}"\/>/.exec(svg)?.[1]
-
-  test('fills its share of the track in the given color', () => {
-    const svg = meterSvg(50, DESKTOP_TONES.yellow)
-    expect(fillWidth(svg)).toBe('16')
-    expect(svg).toContain('fill="#d97706"')
-  })
-
-  test('clamped to the track; any use at all shows at least a dot', () => {
-    expect(fillWidth(meterSvg(150, DESKTOP_TONES.red))).toBe('32')
-    expect(fillWidth(meterSvg(1, DESKTOP_TONES.green))).toBe('6')
-    expect(fillWidth(meterSvg(0, DESKTOP_TONES.green))).toBeUndefined()
-    expect(fillWidth(meterSvg(-5, DESKTOP_TONES.green))).toBeUndefined()
   })
 })
 

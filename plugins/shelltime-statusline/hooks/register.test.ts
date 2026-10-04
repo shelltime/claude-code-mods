@@ -111,9 +111,9 @@ test('draws the full statusline, with links, on terminal and desktop', async ($,
 
   const desktop = await mountBand($, 'desktop')
   for (const key of ['git', 'sessionCost', 'dailyCost', 'quota', 'agentTime', 'context']) {
-    expect(await desktop.find({ key: `pill-${key}` }), key).toBeDefined()
+    expect(await desktop.find({ key: `segment-${key}` }), key).toBeDefined()
   }
-  expect(await desktop.find({ key: 'pill-model' })).toBeUndefined()
+  expect(await desktop.find({ key: 'segment-model' })).toBeUndefined()
   expect(await desktop.find({ type: 'Text', text: 'Opus 5.5' })).toBeUndefined()
   for (const text of ['main*', '$1.23', '$12.50', '1h5m', '23%', '45%', '42%']) {
     expect(await desktop.find({ type: 'Text', text }), text).toBeDefined()
@@ -151,8 +151,8 @@ test('without a ShellTime token: local figures only, no API calls', async ($, on
 
   const desktop = await mountBand($, 'desktop')
   expect(await desktop.find({ type: 'Text', text: '$1.23' })).toBeDefined()
-  expect((await desktop.find({ key: 'pill-dailyCost' }))?.text).toBe('📊-')
-  expect((await desktop.find({ key: 'pill-agentTime' }))?.text).toBe('⏱️-')
+  expect((await desktop.find({ key: 'segment-dailyCost' }))?.text).toBe('📊-')
+  expect((await desktop.find({ key: 'segment-agentTime' }))?.text).toBe('⏱️-')
   expect((await desktop.findAll({ type: 'Link' })).map(link => link.props.href)).toEqual([USAGE_URL, USAGE_URL])
   await desktop.unmount()
 })
