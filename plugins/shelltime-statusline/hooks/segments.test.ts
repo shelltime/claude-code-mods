@@ -11,7 +11,9 @@ import {
   formatDuration,
   formatPlain,
   quotaSegment,
+  segmentText,
 } from './segments'
+import { DESKTOP_TONES, meterSvg } from './ui/desktop'
 
 const VIEW: StatuslineView = {
   git: { branch: 'main', dirty: false },
@@ -40,11 +42,12 @@ describe('buildSegments', () => {
   test('git: dirty gets a star, no repo or no branch is a gray dash', () => {
     expect(segment({ ...VIEW, git: { branch: 'main', dirty: true } }, 'git')).toEqual({
       key: 'git',
-      text: '🌿 main*',
+      icon: '🌿',
+      value: 'main*',
       color: 'green',
     })
-    expect(segment({ ...VIEW, git: null }, 'git')).toEqual({ key: 'git', text: '🌿 -', color: 'gray' })
-    expect(segment({ ...VIEW, git: { branch: '', dirty: false } }, 'git')?.text).toBe('🌿 -')
+    expect(segment({ ...VIEW, git: null }, 'git')).toEqual({ key: 'git', icon: '🌿', value: '-', color: 'gray' })
+    expect(segment({ ...VIEW, git: { branch: '', dirty: false } }, 'git')?.value).toBe('-')
   })
 
   test('links need the login, the web endpoint and (for the session) its id', () => {
@@ -61,37 +64,92 @@ describe('buildSegments', () => {
   })
 
   test('no daily stats: daily cost and agent time are gray dashes', () => {
-    expect(segment({ ...VIEW, daily: null }, 'dailyCost')).toEqual({ key: 'dailyCost', text: '📊 -', color: 'gray' })
-    expect(segment({ ...VIEW, daily: null }, 'agentTime')).toEqual({ key: 'agentTime', text: '⏱️ -', color: 'gray' })
-    expect(segment({ ...VIEW, daily: { costUsd: 0, sessionSeconds: 0 } }, 'dailyCost')?.text).toBe('📊 -')
+    expect(segment({ ...VIEW, daily: null }, 'dailyCost')).toEqual({
+      key: 'dailyCost',
+      icon: '📊',
+      value: '-',
+      color: 'gray',
+    })
+    expect(segment({ ...VIEW, daily: null }, 'agentTime')).toEqual({
+      key: 'agentTime',
+      icon: '⏱️',
+      value: '-',
+      color: 'gray',
+    })
+    expect(segment({ ...VIEW, daily: { costUsd: 0, sessionSeconds: 0 } }, 'dailyCost')?.value).toBe('-')
   })
 
-  test('context: green below 50, yellow from 50, red from 80', () => {
+  test('context: green below 50, yellow from 50, red from 80, with a meter', () => {
     expect(segment({ ...VIEW, contextPercent: 49.4 }, 'context')).toEqual({
       key: 'context',
-      text: '📈 49%',
+      icon: '📈',
+      value: '49%',
       color: 'green',
+      meters: [{ percent: 49.4, description: 'Context window used' }],
     })
     expect(segment({ ...VIEW, contextPercent: 50 }, 'context')?.color).toBe('yellow')
     expect(segment({ ...VIEW, contextPercent: 80 }, 'context')?.color).toBe('red')
   })
 
   test('the model has no color', () => {
-    expect(segment(VIEW, 'model')).toEqual({ key: 'model', text: '🤖 Opus 5.5' })
+    expect(segment(VIEW, 'model')).toEqual({ key: 'model', icon: '🤖', value: 'Opus 5.5' })
+  })
+
+  test('segmentText is the icon and the value', () => {
+    expect(buildSegments(VIEW).map(segmentText)).toEqual([
+      '🌿 main',
+      '🤖 Opus 5.5',
+      '💰 $1.23',
+      '📊 $12.50',
+      '🚦 5h:23% 7d:45%',
+      '⏱️ 1h5m',
+      '📈 42%',
+    ])
   })
 })
 
 describe('quotaSegment', () => {
   test('either bucket missing is a gray dash, still linked', () => {
-    expect(quotaSegment(null, null)).toEqual({ key: 'quota', text: '🚦 -', color: 'gray', url: CLAUDE_USAGE_URL })
-    expect(quotaSegment(null, 45)?.text).toBe('🚦 -')
+    expect(quotaSegment(null, null)).toEqual({
+      key: 'quota',
+      icon: '🚦',
+      value: '-',
+      color: 'gray',
+      url: CLAUDE_USAGE_URL,
+    })
+    expect(quotaSegment(null, 45).value).toBe('-')
+    expect(quotaSegment(null, 45).meters).toBeUndefined()
   })
 
   test('colored by the higher bucket', () => {
     expect(quotaSegment(23, 45).color).toBe('green')
     expect(quotaSegment(55, 10).color).toBe('yellow')
     expect(quotaSegment(10, 85).color).toBe('red')
-    expect(quotaSegment(23.4, 45.6).text).toBe('🚦 5h:23% 7d:46%')
+    expect(quotaSegment(23.4, 45.6).value).toBe('5h:23% 7d:46%')
+  })
+
+  test('one meter per bucket, unrounded', () => {
+    expect(quotaSegment(23.4, 45.6).meters).toEqual([
+      { label: '5h', percent: 23.4, description: '5-hour quota used' },
+      { label: '7d', percent: 45.6, description: '7-day quota used' },
+    ])
+  })
+})
+
+describe('meterSvg', () => {
+  const fillWidth = (svg: string) => /<rect width="(\d+)" height="6" rx="3" fill="#[0-9a-f]{6}"\/>/.exec(svg)?.[1]
+
+  test('fills its share of the track in the given color', () => {
+    const svg = meterSvg(50, DESKTOP_TONES.yellow)
+    expect(fillWidth(svg)).toBe('16')
+    expect(svg).toContain('fill="#d97706"')
+  })
+
+  test('clamped to the track; any use at all shows at least a dot', () => {
+    expect(fillWidth(meterSvg(150, DESKTOP_TONES.red))).toBe('32')
+    expect(fillWidth(meterSvg(1, DESKTOP_TONES.green))).toBe('6')
+    expect(fillWidth(meterSvg(0, DESKTOP_TONES.green))).toBeUndefined()
+    expect(fillWidth(meterSvg(-5, DESKTOP_TONES.green))).toBeUndefined()
   })
 })
 
