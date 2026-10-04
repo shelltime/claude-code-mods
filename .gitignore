@@ -4,3 +4,5 @@ plugins/*/tsconfig.json
 
 node_modules/
 .DS_Store
+
+storybook-static/
