@@ -8,6 +8,28 @@ A mod is a Claude Code plugin made of function hooks: a small TypeScript module 
 | --- | --- |
 | [`shelltime-statusline`](plugins/shelltime-statusline) | The ShellTime statusline (git, model, session and daily cost, quota, agent time, context) above the prompt, in the terminal and the desktop app |
 
+## What you get
+
+![The ShellTime statusline in the Claude desktop app and in the terminal, in light and dark](docs/shelltime-statusline.png)
+
+`shelltime-statusline` draws one line above the prompt. In the desktop app it is a flat row with small bars beside the percentages. In the terminal it is the same line as `shelltime cc statusline`. Both follow Claude Code's light or dark theme.
+
+From left to right:
+
+- 🌿 the git branch, with `*` when the tree is dirty
+- 🤖 the model (terminal only; the desktop composer already shows it)
+- 💰 this session's cost
+- 📊 today's Claude Code cost
+- 🚦 the 5-hour and 7-day quota used
+- ⏱️ today's AI agent time
+- 📈 the context window used
+
+Quota and context turn yellow from 50% and red from 80%. The costs, quota and agent time are links to the session on shelltime.xyz, your coding agent page, claude.ai usage and your profile.
+
+Before you run `shelltime init`, it still shows git, model, session cost, quota and context. Daily cost and agent time show `-`, and nothing is sent to ShellTime. The line refreshes as the conversation moves on, not while the session is idle.
+
+The [mod's README](plugins/shelltime-statusline/README.md) has every segment's colors and where each number comes from.
+
 ## Install
 
 ```sh
