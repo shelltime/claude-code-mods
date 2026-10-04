@@ -2,18 +2,16 @@
 
 The [ShellTime](https://shelltime.xyz) statusline as a Claude Code mod. It draws the ShellTime statusline in a band above the prompt. It runs in the terminal and in the Code tab of the Claude desktop app, where the `statusLine` command from `settings.json` is not drawn.
 
-In the terminal it is the same line as `shelltime cc statusline`:
+In the terminal it is the same line as `shelltime cc statusline`, in Claude Code's theme colors, so it follows `/theme`:
 
 ```
 🌿 main* | 🤖 Opus 5.5 | 💰 $1.23 | 📊 $12.50 | 🚦 5h:23% 7d:45% | ⏱️ 1h5m | 📈 42%
 ```
 
-In the desktop app each segment is a rounded pill, in tones that read on the light and the dark theme. Quota and context get a small bar beside each percentage. The model is left out there, since the composer's footer already shows it.
+In the desktop app it is one flat row, with no borders or padding, in tones that read on the light and the dark theme. Quota and context get a thin bar beside each percentage. The model is left out there, since the composer's footer already shows it.
 
 ```
-╭─────────╮ ╭─────────╮ ╭───────────╮ ╭───────────────────────────╮ ╭─────────╮ ╭──────────────╮
-│ 🌿 main*│ │ 💰 $1.23│ │ 📊 $12.50 │ │ 🚦 5h ━━── 23%  7d ━━━─ 45%│ │ ⏱️ 1h5m │ │ 📈 ━━── 42%  │
-╰─────────╯ ╰─────────╯ ╰───────────╯ ╰───────────────────────────╯ ╰─────────╯ ╰──────────────╯
+🌿 main*   💰 $1.23   📊 $12.50   🚦 5h ━━── 23%  7d ━━━─ 45%   ⏱️ 1h5m   📈 ━━── 42%
 ```
 
 | Segment | Shows | Color | Link |
