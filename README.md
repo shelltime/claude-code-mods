@@ -41,6 +41,15 @@ Or from inside Claude Code: `/plugin marketplace add shelltime/claude-code-mods`
 
 The mods read the ShellTime CLI's config (`~/.shelltime/config.*`). Run `shelltime init` once to sign in.
 
+## Update
+
+```sh
+claude plugin marketplace update shelltime
+claude plugin update shelltime-statusline@shelltime
+```
+
+The first command fetches the latest release from GitHub, the second installs it. Restart Claude Code to load it. The desktop app's Code tab uses the same plugins as the terminal, so one update covers both: quit the app (⌘Q) and open it again.
+
 ## Develop
 
 ```sh
