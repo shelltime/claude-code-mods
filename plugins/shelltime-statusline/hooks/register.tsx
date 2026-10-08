@@ -13,6 +13,7 @@ import {
 import type { ApiRequest, ApiResponse } from './api'
 import { BASE_FILES, LOCAL_FILES, formatOf, mergeConfig, parseShellTimeConfig, resolveConfig } from './config'
 import type { ShellTimeConfig } from './config'
+import { ccPrArgs, createdPullRequestUrls } from './pullRequests'
 import { buildSegments, displayModelName } from './segments'
 import { StatusRow } from './ui/desktop'
 import { StatusLine } from './ui/terminal'
@@ -48,6 +49,7 @@ let lastRemoteAt = Number.NEGATIVE_INFINITY
 let login = ''
 let loginToken = ''
 const sentProjects = new Set<string>()
+const sentPullRequests = new Set<string>()
 const loggedErrors = new Set<string>()
 
 function logOnce($: EngineInterface, what: string, err: unknown) {
@@ -114,6 +116,43 @@ async function sendSessionProject($: EngineInterface, config: ShellTimeConfig, s
   } catch (err) {
     sentProjects.delete(project)
     logOnce($, 'session-project', err)
+  }
+}
+
+// The CLI as install.bash lays it out, then whatever PATH has: a desktop host's
+// PATH often lacks ~/.shelltime/bin.
+async function runShelltime($: EngineInterface, args: readonly string[]) {
+  const home = await $.env.get('HOME')
+  const bins = home === undefined || home === '' ? ['shelltime'] : [`${home}/.shelltime/bin/shelltime`, 'shelltime']
+  let notFound: unknown
+  for (const bin of bins) {
+    let ran
+    try {
+      ran = await $.process.run([bin, ...args], { timeoutMs: 10_000 })
+    } catch (err) {
+      // not there (or hung): try the next one
+      notFound = err
+      continue
+    }
+    if (ran.exitCode !== 0) {
+      throw new Error(`shelltime exited with ${ran.exitCode}: ${ran.stderr.trim()}`)
+    }
+    return
+  }
+  throw notFound
+}
+
+// Links PRs opened by `gh pr create` to the session: `shelltime cc pr` hands
+// them to the daemon, which sends them to ShellTime.
+async function linkPullRequests($: EngineInterface, sessionId: string, urls: readonly string[]) {
+  const fresh = urls.filter(url => !sentPullRequests.has(`${sessionId}\n${url}`))
+  if (sessionId === '' || fresh.length === 0) return
+  for (const url of fresh) sentPullRequests.add(`${sessionId}\n${url}`)
+  try {
+    await runShelltime($, ccPrArgs(sessionId, fresh))
+  } catch (err) {
+    for (const url of fresh) sentPullRequests.delete(`${sessionId}\n${url}`)
+    logOnce($, 'pull-request link', err)
   }
 }
 
@@ -227,6 +266,13 @@ export const register: Register = on => {
   on('tool.call', async ($, e, next) => {
     const result = await next(e)
     schedule($)
+    return result
+  })
+
+  on('classic.PostToolUse', async ($, e, next) => {
+    const result = await next(e)
+    // In the background: the hook never holds up or changes the tool's result.
+    void linkPullRequests($, e.session_id, createdPullRequestUrls(e.tool_name, e.tool_input, e.tool_response))
     return result
   })
 

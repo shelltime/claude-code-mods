@@ -6,7 +6,7 @@ A mod is a Claude Code plugin made of function hooks: a small TypeScript module 
 
 | Mod | What it does |
 | --- | --- |
-| [`shelltime-statusline`](plugins/shelltime-statusline) | The ShellTime statusline (git, model, session and daily cost, quota, agent time, context) above the prompt, in the terminal and the desktop app |
+| [`shelltime-statusline`](plugins/shelltime-statusline) | The ShellTime statusline (git, model, session and daily cost, quota, agent time, context) above the prompt, in the terminal and the desktop app. Also links PRs opened with `gh pr create` to the session on shelltime.xyz |
 
 ## What you get
 
@@ -27,6 +27,8 @@ From left to right:
 Quota and context turn yellow from 50% and red from 80%. The costs, quota and agent time are links to the session on shelltime.xyz, your coding agent page, claude.ai usage and your profile.
 
 Before you run `shelltime init`, it still shows git, model, session cost, quota and context. Daily cost and agent time show `-`, and nothing is sent to ShellTime. The line refreshes as the conversation moves on, not while the session is idle.
+
+When Claude opens a pull request with `gh pr create`, the mod links that PR to the session on shelltime.xyz. This goes through the `shelltime` CLI and its daemon.
 
 The [mod's README](plugins/shelltime-statusline/README.md) has every segment's colors and where each number comes from.
 

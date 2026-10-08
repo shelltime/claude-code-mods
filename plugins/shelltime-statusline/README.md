@@ -37,7 +37,7 @@ Desktop sessions on the same machine load the same installed plugins.
 
 There is nothing to configure in the mod. It reads the ShellTime CLI's own config file, `~/.shelltime/config.yaml` (or `.yml` / `.toml`, with `config.local.*` merged over it), in the same order the CLI does. Run `shelltime init` once and the mod picks up your token. Changes to the file are picked up on the next refresh.
 
-The mod doesn't need the `shelltime` binary or its daemon. Without a token it still shows git, model, session cost, quota and context. Daily cost and agent time show `-`, and nothing is sent to ShellTime.
+The statusline doesn't need the `shelltime` binary or its daemon. Without a token it still shows git, model, session cost, quota and context. Daily cost and agent time show `-`, and nothing is sent to ShellTime. Linking pull requests (below) is the one feature that uses the CLI.
 
 ## Where the numbers come from
 
@@ -48,8 +48,24 @@ The mod doesn't need the `shelltime` binary or its daemon. Without a token it st
 | quota | the daemon calls Anthropic's usage API with the OAuth token from the Keychain | the rate limits Claude Code already read from its last API response. No Keychain access, works on any OS |
 | daily cost, agent time | the daemon queries ShellTime's API | the same GraphQL query, at most once every 15 s |
 | session → project mapping | sent to ShellTime's API | the same request, once per session and directory |
+| session → pull requests | | `shelltime cc pr`, after `gh pr create` prints a PR URL |
 
 Like the native statusline, it refreshes as the conversation changes: when you send a prompt, after each tool call, and when a turn ends. It doesn't poll while the session is idle.
+
+## Pull request links
+
+When a Bash call runs `gh pr create`, the mod reads the PR URLs that `gh` printed on stdout. Commands that chain several `gh pr create` calls are covered too. It then runs:
+
+```sh
+shelltime cc pr --session-id <session id> <pr url>...
+```
+
+The CLI hands the URLs to the ShellTime daemon, which sends them to ShellTime, and they show up on the session. Without a daemon the CLI sends them itself.
+
+- The mod looks for `~/.shelltime/bin/shelltime` first, then `shelltime` on `PATH`.
+- Each URL is sent once per session. If the CLI can't be started, the next `gh pr create` that prints the URL tries again, and the failure goes to Claude Code's debug log.
+- If the CLI can't be found, or is too old to have `cc pr`, nothing is linked. Errors from the CLI itself (not logged in, server unreachable) go to `~/.shelltime/log.log`.
+- This runs from a `PostToolUse` hook, in the background, after the tool returns. It never delays or changes the Bash result Claude sees.
 
 ## Terminal
 

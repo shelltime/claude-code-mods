@@ -1,7 +1,7 @@
 {
   "name": "shelltime-statusline",
   "version": "0.1.2",
-  "description": "ShellTime statusline for Claude Code: git, model, session and daily cost, quota, agent time and context, in the terminal and the desktop app.",
+  "description": "ShellTime statusline for Claude Code: git, model, session and daily cost, quota, agent time and context, in the terminal and the desktop app. Also links PRs opened with gh pr create to the session.",
   "author": {
     "name": "ShellTime",
     "url": "https://shelltime.xyz"
