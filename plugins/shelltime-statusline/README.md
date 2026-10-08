@@ -67,6 +67,27 @@ The CLI hands the URLs to the ShellTime daemon, which sends them to ShellTime, a
 - If the CLI can't be found, or is too old to have `cc pr`, nothing is linked. Errors from the CLI itself (not logged in, server unreachable) go to `~/.shelltime/log.log`.
 - This runs from a `PostToolUse` hook, in the background, after the tool returns. It never delays or changes the Bash result Claude sees.
 
+### Session cost comment
+
+If the ShellTime GitHub App is installed on the repository, ShellTime comments on each linked github.com PR, as the app. The comment shows:
+
+- the session's cost in USD
+- tokens: total, input, output, cache read and cache write
+- duration and active time
+- the model
+- prompts and lines changed
+- a link to the session on shelltime.xyz, which only you can open
+
+The comment is posted a couple of minutes after the PR is linked. ShellTime edits the same comment 30 minutes and 24 hours later, so it ends with the whole session's numbers.
+
+- If you turned off showing your AI cost publicly on shelltime.xyz, the comment leaves out the USD amounts.
+- Delete the comment and it is not posted again.
+- Only PRs opened by a GitHub account linked to your ShellTime account get a comment. If you signed in to ShellTime without GitHub, link your GitHub account first.
+- Without the app on the repository, nothing is posted.
+- Nothing is posted for GitHub Enterprise hosts.
+
+The mod and the CLI do nothing extra for this: ShellTime's server posts the comment once the PR is linked.
+
 ## Terminal
 
 If `~/.claude/settings.json` also has a `statusLine` running `shelltime cc statusline`, the terminal shows both lines. Keep both, or remove one.

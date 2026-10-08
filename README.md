@@ -28,7 +28,7 @@ Quota and context turn yellow from 50% and red from 80%. The costs, quota and ag
 
 Before you run `shelltime init`, it still shows git, model, session cost, quota and context. Daily cost and agent time show `-`, and nothing is sent to ShellTime. The line refreshes as the conversation moves on, not while the session is idle.
 
-When Claude opens a pull request with `gh pr create`, the mod links that PR to the session on shelltime.xyz. This goes through the `shelltime` CLI and its daemon.
+When Claude opens a pull request with `gh pr create`, the mod links that PR to the session on shelltime.xyz. This goes through the `shelltime` CLI and its daemon. If the repository has the ShellTime GitHub App installed, ShellTime also comments on the PR with the session's tokens, cost and time, and a link to the session.
 
 The [mod's README](plugins/shelltime-statusline/README.md) has every segment's colors and where each number comes from.
 
