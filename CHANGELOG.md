@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.3](https://github.com/shelltime/claude-code-mods/compare/v0.1.2...v0.1.3) (2026-10-08)
+
+
+### Features
+
+* **statusline:** link PRs from gh pr create to the session ([c00dd73](https://github.com/shelltime/claude-code-mods/commit/c00dd734c7957ef2bb7585d4d713fb425ff17d88))
+* **statusline:** link PRs from gh pr create to the session ([36fb0bf](https://github.com/shelltime/claude-code-mods/commit/36fb0bfe5845a9b5a9ec8217d82ad2695b0bea93))
+
+
+### Documentation
+
+* **readme:** add plugin update steps ([3de30f6](https://github.com/shelltime/claude-code-mods/commit/3de30f62d0feeded7309321dec414fc5e05611d2))
+* **readme:** add plugin update steps ([7026ea5](https://github.com/shelltime/claude-code-mods/commit/7026ea5d14f464d97f24c4596d454b537fa3ed6d))
+* **statusline:** describe the session cost comment on linked PRs ([fbef93d](https://github.com/shelltime/claude-code-mods/commit/fbef93dbca500f0555ac44e06e1a48cc286c6108))
+* **statusline:** describe the session cost comment on linked PRs ([4009be3](https://github.com/shelltime/claude-code-mods/commit/4009be3586658b58b7dae9f27042255beda199aa))
+
 ## [0.1.2](https://github.com/shelltime/claude-code-mods/compare/v0.1.1...v0.1.2) (2026-10-04)
 
 
