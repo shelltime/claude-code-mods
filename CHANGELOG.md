@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.4](https://github.com/shelltime/claude-code-mods/compare/v0.1.3...v0.1.4) (2026-10-10)
+
+
+### Features
+
+* **statusline:** report session end so ShellTime summarizes it right away ([0ef5c14](https://github.com/shelltime/claude-code-mods/commit/0ef5c142b7697d30e8278b88a3cd1b8de2f429d6))
+* **statusline:** report session end so ShellTime summarizes it right away ([efdff72](https://github.com/shelltime/claude-code-mods/commit/efdff72304c224e1789b4f30869f977ca79ae98a))
+
 ## [0.1.3](https://github.com/shelltime/claude-code-mods/compare/v0.1.2...v0.1.3) (2026-10-08)
 
 
