@@ -11,7 +11,7 @@
     {
       "name": "shelltime-statusline",
       "source": "./plugins/shelltime-statusline",
-      "description": "ShellTime statusline for Claude Code: git, model, session and daily cost, quota, agent time and context, in the terminal and the desktop app. Also links PRs opened with gh pr create to the session.",
+      "description": "ShellTime statusline for Claude Code: git, model, session and daily cost, quota, agent time and context, in the terminal and the desktop app. Also links PRs opened with gh pr create to the session, and reports when the session ends so ShellTime summarizes it right away.",
       "category": "productivity"
     }
   ]
