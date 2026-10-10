@@ -49,6 +49,7 @@ The statusline doesn't need the `shelltime` binary or its daemon. Without a toke
 | daily cost, agent time | the daemon queries ShellTime's API | the same GraphQL query, at most once every 15 s |
 | session → project mapping | sent to ShellTime's API | the same request, once per session and directory |
 | session → pull requests | | `shelltime cc pr`, after `gh pr create` prints a PR URL |
+| session end | | one request to ShellTime's API when the session ends |
 
 Like the native statusline, it refreshes as the conversation changes: when you send a prompt, after each tool call, and when a turn ends. It doesn't poll while the session is idle.
 
@@ -77,8 +78,9 @@ If the ShellTime GitHub App is installed on the repository, ShellTime comments o
 - the model
 - prompts and lines changed
 - a link to the session on shelltime.xyz, which only you can open
+- once ShellTime has summarized the session: its AI title, a one-line description and the summary
 
-The comment is posted a couple of minutes after the PR is linked. ShellTime edits the same comment 30 minutes and 24 hours later, so it ends with the whole session's numbers.
+The comment is posted a couple of minutes after the PR is linked. When the session ends, ShellTime edits it again right after summarizing the session (see below), then 30 minutes and 24 hours after the link, so it ends with the whole session's numbers.
 
 - If you turned off showing your AI cost publicly on shelltime.xyz, the comment leaves out the USD amounts.
 - Delete the comment and it is not posted again.
@@ -87,6 +89,21 @@ The comment is posted a couple of minutes after the PR is linked. ShellTime edit
 - Nothing is posted for GitHub Enterprise hosts.
 
 The mod and the CLI do nothing extra for this: ShellTime's server posts the comment once the PR is linked.
+
+## Session end
+
+When the session ends (you exit, `/clear`, `/resume` another session, log out, or a `-p` run finishes), the mod tells ShellTime:
+
+```
+POST <apiEndpoint>/api/v1/cc/session-end
+{"sessionId": "<session id>", "reason": "<why it ended>"}
+```
+
+About 30 seconds later, once the telemetry Claude Code sends on exit has arrived, ShellTime writes the session's AI title, description and summary. Right after that it updates the cost comment on the session's PRs. Without this, the summary waits for ShellTime's timed runs, 20 minutes or 24 hours after the session's activity.
+
+- It's one request, with no retry. Claude Code gives everything that runs at the end of a session 1.5 seconds, and this runs alongside its own end step. If the request doesn't make it, the timed runs still summarize the session.
+- ShellTime's 24-hour run stays as a last check. It only summarizes the session again if it changed, for example after a `claude --resume`.
+- Without a token, nothing is sent. Failures go to Claude Code's debug log. The exit is never held up or fails because of it.
 
 ## Terminal
 

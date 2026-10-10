@@ -80,6 +80,12 @@ export function sessionProjectRequest(
   return post(config, '/api/v1/cc/session-project', { sessionId, projectPath })
 }
 
+// shelltime/server handler/cc_session_end.go: the session is over, so ShellTime
+// summarizes it and comments on its pull requests now.
+export function sessionEndRequest(config: ShellTimeConfig, sessionId: string, reason: string): ApiRequest {
+  return post(config, '/api/v1/cc/session-end', { sessionId, reason })
+}
+
 function graphqlData<T>(res: ApiResponse): T {
   if (!res.ok) throw new Error(`HTTP error: ${res.status}`)
   const body = JSON.parse(res.text) as { data?: T; errors?: { message: string }[] }

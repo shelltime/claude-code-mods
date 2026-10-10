@@ -7,6 +7,7 @@ import {
   dailyStatsRequest,
   parseDailyStats,
   parseUserLogin,
+  sessionEndRequest,
   sessionProjectRequest,
   userProfileRequest,
 } from './api'
@@ -156,6 +157,21 @@ async function linkPullRequests($: EngineInterface, sessionId: string, urls: rea
   }
 }
 
+// Tells ShellTime the session is over, so it summarizes the session and
+// comments on its PRs now instead of on a timed run. One POST and no retry:
+// every session.end hook shares the exit's 1.5 s bound, and the server's timed
+// runs cover a report that doesn't make it.
+async function sendSessionEnd($: EngineInterface, sessionId: string, reason: string) {
+  if (sessionId === '') return
+  try {
+    const config = await loadConfig($)
+    if (config.token === '') return
+    checkOk(await send($, sessionEndRequest(config, sessionId, reason)))
+  } catch (err) {
+    logOnce($, 'session-end', err)
+  }
+}
+
 // Daily cost, agent time and login from ShellTime's API.
 async function refreshRemote($: EngineInterface, sessionId: string, cwd: string) {
   if (isRemoteRunning) return
@@ -274,6 +290,15 @@ export const register: Register = on => {
     // In the background: the hook never holds up or changes the tool's result.
     void linkPullRequests($, e.session_id, createdPullRequestUrls(e.tool_name, e.tool_input, e.tool_response))
     return result
+  })
+
+  on('session.end', async ($, e, next) => {
+    // Alongside the engine's own end step, not ahead of it, so the report
+    // never pushes that step past the exit's bound.
+    const sent = sendSessionEnd($, e.sessionId, e.reason)
+    const ended = await next(e)
+    await sent
+    return ended
   })
 
   on('turn.complete', async ($, e, next) => {
