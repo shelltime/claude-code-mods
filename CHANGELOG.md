@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/shelltime/claude-code-mods/compare/v0.1.4...v0.1.5) (2026-10-14)
+
+
+### Continuous Integration
+
+* run Claude review with the built-in code-review command ([#14](https://github.com/shelltime/claude-code-mods/issues/14)) ([73adb5a](https://github.com/shelltime/claude-code-mods/commit/73adb5abfa9706a6bce1f564dee025645f2acade))
+
 ## [0.1.4](https://github.com/shelltime/claude-code-mods/compare/v0.1.3...v0.1.4) (2026-10-10)
 
 
