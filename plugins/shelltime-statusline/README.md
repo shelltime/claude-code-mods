@@ -66,7 +66,8 @@ The CLI hands the URLs to the ShellTime daemon, which sends them to ShellTime, a
 - The mod looks for `~/.shelltime/bin/shelltime` first, then `shelltime` on `PATH`.
 - Each URL is sent once per session. If the CLI can't be started, the next `gh pr create` that prints the URL tries again, and the failure goes to Claude Code's debug log.
 - If the CLI can't be found, or is too old to have `cc pr`, nothing is linked. Errors from the CLI itself (not logged in, server unreachable) go to `~/.shelltime/log.log`.
-- This runs from a `PostToolUse` hook, in the background, after the tool returns. It never delays or changes the Bash result Claude sees.
+- This runs from a `tool.call` hook on Bash, in the background, after the tool returns. It never delays or changes the Bash result Claude sees. Only a call that succeeded counts.
+- It is not a `PostToolUse` hook because on Team and Enterprise plans Claude Code's built-in `cc-plugin-sec-default` runs before every installed plugin and sends `PostToolUse` (every `classic.*` event) on past them, so such a hook never runs there.
 
 ### Session cost comment
 

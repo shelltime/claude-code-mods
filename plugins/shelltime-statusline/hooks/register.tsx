@@ -285,11 +285,23 @@ export const register: Register = on => {
     return result
   })
 
-  on('classic.PostToolUse', async ($, e, next) => {
-    const result = await next(e)
+  // tool.call, not classic.PostToolUse: on Team and Enterprise plans the
+  // built-in cc-plugin-sec-default sits above every installed plugin and sends
+  // each classic.* event past them, so a classic hook here never runs.
+  on('tool.call', { tool: 'Bash' }, async ($, e, next) => {
+    const ran = await next(e)
+    // Only a call that succeeded, as PostToolUse saw it: a failed or refused
+    // one opened nothing to link.
+    const urls =
+      ran.deny === undefined && ran.isError !== true ? createdPullRequestUrls(e.command, ran.result.stdout) : []
     // In the background: the hook never holds up or changes the tool's result.
-    void linkPullRequests($, e.session_id, createdPullRequestUrls(e.tool_name, e.tool_input, e.tool_response))
-    return result
+    if (urls.length > 0) {
+      void $.session.id().then(
+        sessionId => linkPullRequests($, sessionId, urls),
+        err => logOnce($, 'pull-request link', err),
+      )
+    }
+    return ran
   })
 
   on('session.end', async ($, e, next) => {
