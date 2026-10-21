@@ -15,18 +15,12 @@ export function extractPullRequestUrls(stdout: string): string[] {
   return [...new Set(stdout.match(PR_URL) ?? [])]
 }
 
-function stringField(value: unknown, key: string): string {
-  if (typeof value !== 'object' || value === null) return ''
-  const field = (value as Record<string, unknown>)[key]
-  return typeof field === 'string' ? field : ''
-}
-
-// The URLs a PostToolUse event's Bash call printed when it ran `gh pr create`;
-// none for any other tool or command. stdout only: `gh` reports an existing PR
-// for the branch on stderr, and that one wasn't opened here.
-export function createdPullRequestUrls(toolName: string, toolInput: unknown, toolResponse: unknown): string[] {
-  if (toolName !== 'Bash' || !isPrCreateCommand(stringField(toolInput, 'command'))) return []
-  return extractPullRequestUrls(stringField(toolResponse, 'stdout'))
+// The URLs a Bash call printed when it ran `gh pr create`; none for any other
+// command. stdout only: `gh` reports an existing PR for the branch on stderr,
+// and that one wasn't opened here.
+export function createdPullRequestUrls(command: string, stdout: string): string[] {
+  if (!isPrCreateCommand(command)) return []
+  return extractPullRequestUrls(stdout)
 }
 
 export function ccPrArgs(sessionId: string, urls: readonly string[]): string[] {
