@@ -109,3 +109,27 @@ About 30 seconds later, once the telemetry Claude Code sends on exit has arrived
 ## Terminal
 
 If `~/.claude/settings.json` also has a `statusLine` running `shelltime cc statusline`, the terminal shows both lines. Keep both, or remove one.
+
+### Links show the full URL
+
+The links are drawn as OSC 8 hyperlinks, but only in terminals Claude Code knows support them: iTerm2, WezTerm, VS Code, Ghostty, Hyper, kitty, Alacritty, Warp, Windows Terminal, JetBrains and tmux 3.4+. In any other terminal, Claude Code prints each segment followed by its URL in dim, and the line wraps:
+
+```
+💰 $1.23 https://shelltime.xyz/users/<you>/coding-agent/session/<session id> | 📊 $12.50 https://shelltime.xyz/users/<you>/coding-agent/claude-code | …
+```
+
+The mod can't change this. Check that your terminal draws OSC 8 links: this should print a clickable `ShellTime` and nothing else.
+
+```sh
+printf '\e]8;;https://shelltime.xyz\e\\ShellTime\e]8;;\e\\\n'
+```
+
+If it does, set `FORCE_HYPERLINK=1` for that terminal and restart `claude`. In fish, with the terminal's `TERM_PROGRAM` (here Rex's):
+
+```fish
+if test "$TERM_PROGRAM" = rex
+    set -gx FORCE_HYPERLINK 1
+end
+```
+
+Or add `"FORCE_HYPERLINK": "1"` to the `env` block of `~/.claude/settings.json`, which applies in every terminal.
