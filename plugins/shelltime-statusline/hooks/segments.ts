@@ -72,20 +72,23 @@ function missing(key: SegmentKey, icon: string, url?: string): Segment {
   return { key, icon, value: '-', color: 'gray', url }
 }
 
+// The windows the account has: a plan without a 5-hour limit shows `7d:45%`
+// alone, colored by it. A dash only when there is neither.
 export function quotaSegment(fiveHour: number | null, sevenDay: number | null): Segment {
-  if (fiveHour === null || sevenDay === null) {
+  const meters = [
+    { label: '5h', percent: fiveHour, description: '5-hour quota used' },
+    { label: '7d', percent: sevenDay, description: '7-day quota used' },
+  ].filter((meter): meter is Meter & { label: string } => meter.percent !== null)
+  if (meters.length === 0) {
     return missing('quota', '🚦', CLAUDE_USAGE_URL)
   }
   return {
     key: 'quota',
     icon: '🚦',
-    value: `5h:${Math.round(fiveHour)}% 7d:${Math.round(sevenDay)}%`,
-    color: thresholdColor(Math.max(fiveHour, sevenDay)),
+    value: meters.map(meter => `${meter.label}:${Math.round(meter.percent)}%`).join(' '),
+    color: thresholdColor(Math.max(...meters.map(meter => meter.percent))),
     url: CLAUDE_USAGE_URL,
-    meters: [
-      { label: '5h', percent: fiveHour, description: '5-hour quota used' },
-      { label: '7d', percent: sevenDay, description: '7-day quota used' },
-    ],
+    meters,
   }
 }
 

@@ -49,6 +49,7 @@ describe('desktop row', () => {
     expect(textOf(segment(VIEWS.full, 'git'))).toBe('🌿main*')
     expect(textOf(segment(VIEWS.full, 'sessionCost'))).toBe('💰$1.23')
     expect(textOf(segment(VIEWS.full, 'quota'))).toBe('🚦5h23%7d45%')
+    expect(textOf(segment(VIEWS.noFiveHour, 'quota'))).toBe('🚦7d45%')
     expect(textOf(segment(VIEWS.full, 'context'))).toBe('📈42%')
   })
 

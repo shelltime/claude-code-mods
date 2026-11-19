@@ -20,7 +20,7 @@ In the desktop app it is one flat row, with no borders or padding, in tones that
 | 🤖 | Model (terminal only) | | |
 | 💰 | This session's cost | cyan | the session on shelltime.xyz |
 | 📊 | Today's Claude Code cost | yellow (amber on desktop), gray `-` with none | your coding agent page |
-| 🚦 | 5-hour and 7-day quota used | green, yellow from 50%, red from 80%; on desktop each bucket has its own bar and color | claude.ai usage |
+| 🚦 | 5-hour and 7-day quota used; a plan without a 5-hour limit shows `7d` alone | green, yellow from 50%, red from 80%; on desktop each bucket has its own bar and color | claude.ai usage |
 | ⏱️ | Today's AI agent time | magenta, gray `-` with none | your profile |
 | 📈 | Context window used, with a bar on desktop | green, yellow from 50%, red from 80% | |
 

@@ -22,6 +22,8 @@ export const VIEWS = {
   noToken: { ...FULL, daily: null, login: '', webEndpoint: '' },
   // Close to the limits: quota and context past the thresholds.
   highUsage: { ...FULL, fiveHourPercent: 85, sevenDayPercent: 62, contextPercent: 91, sessionCost: 18.4 },
+  // A plan without a 5-hour limit: the 7-day window alone.
+  noFiveHour: { ...FULL, fiveHourPercent: null },
   // Outside a repo, before the rate limits are known.
   noGit: { ...FULL, git: null, fiveHourPercent: null, sevenDayPercent: null },
   // A long branch name.
