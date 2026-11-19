@@ -20,7 +20,7 @@ From left to right:
 - 🤖 the model (terminal only; the desktop composer already shows it)
 - 💰 this session's cost
 - 📊 today's Claude Code cost
-- 🚦 the 5-hour and 7-day quota used
+- 🚦 the 5-hour and 7-day quota used (only 7-day on plans without a 5-hour limit)
 - ⏱️ today's AI agent time
 - 📈 the context window used
 

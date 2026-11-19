@@ -35,6 +35,7 @@ describe('terminal line', () => {
     expect(textProps(VIEWS.full, '⏱️ 1h5m')).toEqual({ color: 'merged' })
     expect(textProps(VIEWS.full, '📈 42%')).toEqual({ color: 'success' })
     expect(textProps(VIEWS.highUsage, '🚦 5h:85% 7d:62%')).toEqual({ color: 'error' })
+    expect(textProps(VIEWS.noFiveHour, '🚦 7d:45%')).toEqual({ color: 'success' })
     expect(textProps(VIEWS.highUsage, '📈 91%')).toEqual({ color: 'error' })
   })
 

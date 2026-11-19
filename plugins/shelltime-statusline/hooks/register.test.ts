@@ -23,7 +23,12 @@ function ran(stdout: string, exitCode = 0) {
 
 // The world beneath the plugin: a session in a dirty git checkout on `main`,
 // and the CLI's config holding `token` when one is given.
-function world(on: On, token?: string) {
+const RATE_LIMITS = [
+  { kind: 'five_hour', percentUsed: 23 },
+  { kind: 'seven_day', percentUsed: 45 },
+]
+
+function world(on: On, token?: string, rateLimits = RATE_LIMITS) {
   mock.env(on, { HOME: '/home/me' })
   const clock = mock.clock(on, { now: Date.UTC(2026, 9, 4, 12) })
 
@@ -32,10 +37,7 @@ function world(on: On, token?: string) {
     value: {
       startedAt: 0,
       context: { tokens: 84_000, window: 200_000, percent: 42 },
-      rateLimits: [
-        { kind: 'five_hour', percentUsed: 23 },
-        { kind: 'seven_day', percentUsed: 45 },
-      ],
+      rateLimits,
       cost: { usd: 1.234 },
     },
   }))
@@ -154,6 +156,28 @@ test('without a ShellTime token: local figures only, no API calls', async ($, on
   expect((await desktop.find({ key: 'segment-dailyCost' }))?.text).toBe('📊-')
   expect((await desktop.find({ key: 'segment-agentTime' }))?.text).toBe('⏱️-')
   expect((await desktop.findAll({ type: 'Link' })).map(link => link.props.href)).toEqual([USAGE_URL, USAGE_URL])
+  await desktop.unmount()
+})
+
+test('a plan without a 5-hour limit shows the 7-day quota alone', async ($, on) => {
+  const { clock } = world(on, undefined, [{ kind: 'seven_day', percentUsed: 45 }])
+
+  await $.session.start({ cwd: '/work/app', surface: 'terminal', isInteractive: true })
+  await clock.advance(300)
+  await clock.settle()
+
+  const terminal = await mountBand($, 'terminal')
+  expect(await terminal.find({ type: 'Text', text: '🚦 7d:45%' })).toBeDefined()
+  await terminal.unmount()
+
+  const desktop = await mountBand($, 'desktop')
+  expect(await desktop.find({ type: 'Text', text: '7d' })).toBeDefined()
+  expect(await desktop.find({ type: 'Text', text: '45%' })).toBeDefined()
+  expect(await desktop.find({ type: 'Text', text: '5h' })).toBeUndefined()
+  expect((await desktop.findAll({ type: 'Svg' })).map(svg => svg.props.alt)).toEqual([
+    '7-day quota used: 45%',
+    'Context window used: 42%',
+  ])
   await desktop.unmount()
 })
 

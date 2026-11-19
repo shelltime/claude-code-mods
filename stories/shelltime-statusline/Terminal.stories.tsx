@@ -24,6 +24,9 @@ export const NoToken: Story = { args: { view: 'noToken' } }
 
 export const HighUsage: Story = { args: { view: 'highUsage' } }
 
+// A plan without a 5-hour limit shows the 7-day quota alone.
+export const NoFiveHour: Story = { args: { view: 'noFiveHour' } }
+
 export const NoGit: Story = { args: { view: 'noGit' } }
 
 // Narrower than the line: it wraps between segments.

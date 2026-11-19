@@ -108,7 +108,7 @@ describe('buildSegments', () => {
 })
 
 describe('quotaSegment', () => {
-  test('either bucket missing is a gray dash, still linked', () => {
+  test('both buckets missing is a gray dash, still linked', () => {
     expect(quotaSegment(null, null)).toEqual({
       key: 'quota',
       icon: '🚦',
@@ -116,8 +116,24 @@ describe('quotaSegment', () => {
       color: 'gray',
       url: CLAUDE_USAGE_URL,
     })
-    expect(quotaSegment(null, 45).value).toBe('-')
-    expect(quotaSegment(null, 45).meters).toBeUndefined()
+  })
+
+  test('a plan without a 5-hour limit shows the 7-day bucket alone, colored by it', () => {
+    expect(quotaSegment(null, 45)).toEqual({
+      key: 'quota',
+      icon: '🚦',
+      value: '7d:45%',
+      color: 'green',
+      url: CLAUDE_USAGE_URL,
+      meters: [{ label: '7d', percent: 45, description: '7-day quota used' }],
+    })
+    expect(quotaSegment(null, 85).color).toBe('red')
+  })
+
+  test('a lone 5-hour bucket is shown too', () => {
+    expect(quotaSegment(55, null).value).toBe('5h:55%')
+    expect(quotaSegment(55, null).color).toBe('yellow')
+    expect(quotaSegment(55, null).meters).toEqual([{ label: '5h', percent: 55, description: '5-hour quota used' }])
   })
 
   test('colored by the higher bucket', () => {
